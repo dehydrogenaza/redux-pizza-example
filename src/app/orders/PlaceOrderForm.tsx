@@ -1,0 +1,60 @@
+import { useState } from 'react'
+import { useAppDispatch } from '../hooks'
+import { orderPlaced } from './ordersSlice'
+
+const PlaceOrderForm = () => {
+  const dispatch = useAppDispatch()
+
+  const [newItem, setNewItem] = useState<string>('')
+  const [orderItems, setOrderItems] = useState<string[]>([])
+  const [clientId, setClientId] = useState<string>('')
+
+  const handlePlaceOrder = () => {
+    dispatch(orderPlaced({ clientId: clientId, items: orderItems }))
+  }
+
+  const handleAddItemToOrder = () => {
+    newItem && setOrderItems((items) => [...items, newItem])
+    setNewItem('')
+  }
+
+  return (
+    <>
+      <form>
+        <div>
+          <label htmlFor={'orderClientId'}>Client: </label>
+          <input
+            type='text'
+            id={'orderClientId'}
+            name={'orderClientId'}
+            placeholder={'Choose client ID...'}
+            value={clientId}
+            onChange={(e) => setClientId(e.target.value)}
+          />
+        </div>
+        <div>
+          {orderItems.map((item, index) => (
+            <p key={`newItem-${index}`}>- {item}</p>
+          ))}
+        </div>
+        <div>
+          <label htmlFor={'orderItem'}>Add item: </label>
+          <input
+            type='text'
+            id={'orderItem'}
+            name={'orderItem'}
+            placeholder={'Add item to order...'}
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+          />
+          <button type={'button'} onClick={handleAddItemToOrder}>
+            +
+          </button>
+        </div>
+      </form>
+      <button onClick={handlePlaceOrder}>Place order</button>
+      {/*<button onClick={handleCancelOrder}>Cancel order</button>*/}
+    </>
+  )
+}
+export default PlaceOrderForm
