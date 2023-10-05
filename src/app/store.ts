@@ -4,8 +4,6 @@ import ordersReducer from './orders/ordersSlice'
 export const store = configureStore({
   reducer: {
     orders: ordersReducer,
-    // products: productsReducer,
-    // reviews: reviewsReducer,
   },
 })
 

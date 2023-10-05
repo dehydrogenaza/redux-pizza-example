@@ -38,13 +38,13 @@ const initialState = [
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
+  // action cases are named as events in past tense
   reducers: {
-    // action case: event described in past tense
     // variant with additional pre-reducer logic in 'prepare'
     orderPlaced: {
       reducer(state, action: PayloadAction<OrderState>) {
         if (action.payload.clientId && action.payload.items.length > 0) {
-          state.push(action.payload) //ONLY allowed inside createSlice() / createReducer()
+          state.push(action.payload) //draft state "mutation" ONLY allowed inside createSlice() / createReducer()
         }
       },
       prepare({ clientId, items }: Order) {

@@ -18,6 +18,10 @@ const PlaceOrderForm = () => {
     setNewItem('')
   }
 
+  const canPlaceOrder = (): boolean => {
+    return !!clientId && orderItems.length > 0
+  }
+
   return (
     <>
       <form>
@@ -52,8 +56,11 @@ const PlaceOrderForm = () => {
           </button>
         </div>
       </form>
-      <button onClick={handlePlaceOrder}>Place order</button>
-      {/*<button onClick={handleCancelOrder}>Cancel order</button>*/}
+      {canPlaceOrder() && (
+        <button onClick={handlePlaceOrder} disabled={!canPlaceOrder()}>
+          Place order
+        </button>
+      )}
     </>
   )
 }
