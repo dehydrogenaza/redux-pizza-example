@@ -1,17 +1,12 @@
 import {
   createAsyncThunk,
+  createEntityAdapter,
   createSelector,
   createSlice,
   nanoid,
   PayloadAction,
 } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-
-type OrderState = {
-  data: Order[]
-  status: 'idle' | 'pending' | 'fulfilled' | 'rejected'
-  error?: string
-}
 
 export type Order = {
   id: string
@@ -25,30 +20,41 @@ export type NewOrder = {
   items: string[]
 }
 
-//mock data
-const initialState = {
-  data: [
-    {
-      id: '1',
-      clientId: 'Bartosz Dudek',
-      date: '4.10.2023, 10:00:00',
-      items: ['Capriciosa', 'beer'],
-    },
-    {
-      id: '2',
-      clientId: 'Piotr Wichliński',
-      date: '4.10.2023, 10:15:00',
-      items: ['Quattro Formaggi', 'non-alcoholic beer'],
-    },
-    {
-      id: '3',
-      clientId: 'Dawid Płatek',
-      date: '4.10.2023, 10:30:00',
-      items: ['Funghi', 'Long Island'],
-    },
-  ],
+type FetchStatus = {
+  status: string
+  error?: string
+}
+
+const ordersAdapter = createEntityAdapter<Order>({
+  selectId: (order) => order.id,
+})
+
+const emptyInitialState = ordersAdapter.getInitialState({
   status: 'idle',
-} as OrderState //recommended cast instead of specifying type, to prevent TS from unnecessarily narrowing the type
+  error: undefined,
+} as FetchStatus)
+
+//mock data
+const initialState = ordersAdapter.upsertMany(emptyInitialState, [
+  {
+    id: '1',
+    clientId: 'Bartosz Dudek',
+    date: '4.10.2023, 10:00:00',
+    items: ['Capriciosa', 'beer'],
+  },
+  {
+    id: '2',
+    clientId: 'Piotr Wichliński',
+    date: '4.10.2023, 10:15:00',
+    items: ['Quattro Formaggi', 'non-alcoholic beer'],
+  },
+  {
+    id: '3',
+    clientId: 'Dawid Płatek',
+    date: '4.10.2023, 10:30:00',
+    items: ['Funghi', 'Long Island'],
+  },
+])
 
 // any async actions (in fact any side effects at all) are NOT allowed in reducers, but they can be wrapped in thunks
 export const fakeFetchOrders = createAsyncThunk('orders/fetchedMore', async () => {
@@ -64,7 +70,7 @@ const ordersSlice = createSlice({
     orderPlaced: {
       reducer(state, action: PayloadAction<Order>) {
         if (action.payload.clientId && action.payload.items.length > 0) {
-          state.data.push(action.payload) //draft state "mutation" ONLY allowed inside createSlice() / createReducer()
+          ordersAdapter.addOne(state, action.payload) //draft state "mutation" ONLY allowed inside createSlice() / createReducer()
         }
       },
       prepare({ clientId, items }: NewOrder) {
@@ -76,7 +82,7 @@ const ordersSlice = createSlice({
 
     // simplified variant, no 'prepare' logic
     orderCanceled: (state, action: PayloadAction<string>) => {
-      state.data = state.data.filter((order) => order.id !== action.payload)
+      ordersAdapter.removeOne(state, action.payload)
     },
   },
   extraReducers(builder) {
@@ -86,7 +92,7 @@ const ordersSlice = createSlice({
       })
       .addCase(fakeFetchOrders.fulfilled, (state, action) => {
         state.status = 'fulfilled'
-        state.data.push(prepareNewOrder(action.payload.clientId, action.payload.items))
+        ordersAdapter.addOne(state, prepareNewOrder(action.payload.clientId, action.payload.items))
       })
       .addCase(fakeFetchOrders.rejected, (state, action) => {
         state.status = 'rejected'
@@ -95,16 +101,14 @@ const ordersSlice = createSlice({
   },
 })
 export const { orderPlaced, orderCanceled } = ordersSlice.actions
-
-export const selectOrders = (state: RootState) => state.orders.data
 export const selectStatus = (state: RootState) => state.orders.status
 export const selectError = (state: RootState) => state.orders.error // not currently implemented, but can be used to extract info from rejected Promises
 
-export const selectOrderById = (state: RootState, orderId: string) =>
-  state.orders.data.find((order) => order.id === orderId)
-// this will cause unnecessary re-renders with *each* update
-// export const selectOrdersByItem = (state: RootState, item: string) =>
-//   state.orders.filter((order) => order.items.includes(item))
+export const {
+  selectAll: selectOrders,
+  selectById: selectOrderById,
+  selectIds: selectOrderIds,
+} = ordersAdapter.getSelectors((state: RootState) => state.orders)
 
 // the solution is to memoize selectors using 'createSelector()'
 export const selectOrdersByItem = createSelector(
