@@ -84,6 +84,13 @@ const ordersSlice = createSlice({
     orderCanceled: (state, action: PayloadAction<string>) => {
       ordersAdapter.removeOne(state, action.payload)
     },
+
+    beerRequested: (state, action: PayloadAction<string>) => {
+      const existingOrder = state.entities[action.payload]
+      if (existingOrder) {
+        existingOrder.items.push('beer')
+      }
+    },
   },
   extraReducers(builder) {
     builder
@@ -100,7 +107,7 @@ const ordersSlice = createSlice({
       })
   },
 })
-export const { orderPlaced, orderCanceled } = ordersSlice.actions
+export const { orderPlaced, orderCanceled, beerRequested } = ordersSlice.actions
 export const selectStatus = (state: RootState) => state.orders.status
 export const selectError = (state: RootState) => state.orders.error // not currently implemented, but can be used to extract info from rejected Promises
 

@@ -1,12 +1,12 @@
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { fakeFetchOrders, selectOrders, selectStatus } from './ordersSlice'
+import { fakeFetchOrders, selectOrderIds, selectStatus } from './ordersSlice'
 import Order from './Order'
 import PlaceOrderForm from './PlaceOrderForm'
 
 const Orders = () => {
   const dispatch = useAppDispatch()
 
-  const orders = useAppSelector(selectOrders)
+  const orderIds = useAppSelector(selectOrderIds)
   const ordersStatus = useAppSelector(selectStatus)
 
   const handleFetchNewOrders = async () => {
@@ -29,8 +29,8 @@ const Orders = () => {
       <PlaceOrderForm />
       <h1>All orders</h1>
       <ul>
-        {orders.map((order) => {
-          return <Order key={`order-${order?.id}`} orderId={order.id} />
+        {orderIds.map((orderId) => {
+          return <Order key={`order-${orderId}`} orderId={orderId.toString()} />
         })}
       </ul>
       <hr />
