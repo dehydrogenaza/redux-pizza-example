@@ -24,7 +24,7 @@ const Order = ({ orderId }: OrderProps) => {
         <strong>Client: {order?.clientId}</strong>
       </p>
       <p>{order?.date}</p>
-      <ul>{order?.items.map((item, index) => <li key={`item-${item}`}>{item}</li>)}</ul>
+      <ul>{order?.items.map((item, index) => <li key={`item-${index}`}>{item}</li>)}</ul>
       <button onClick={handleCancelOrder}>Cancel</button>
       <button onClick={handleAddBeer}>Add beer</button>
     </li>
