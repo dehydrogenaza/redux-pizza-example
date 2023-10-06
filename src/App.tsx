@@ -1,13 +1,17 @@
 import './App.css'
 import Orders from './app/orders/Orders'
-import PlaceOrderForm from './app/orders/PlaceOrderForm'
+import ByItem from './app/orders/ByItem'
 
 function App() {
   return (
-    <>
-      <PlaceOrderForm />
-      <Orders />
-    </>
+    <div className={'top-container'}>
+      <div className={'panel'}>
+        <Orders />
+      </div>
+      <div className={'panel'}>
+        <ByItem />
+      </div>
+    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 
 type OrderState = {
@@ -71,5 +71,22 @@ export const selectOrders = (state: RootState) => state.orders
 
 export const selectOrderById = (state: RootState, orderId: string) =>
   state.orders.find((order) => order.id === orderId)
+
+// this will cause unnecessary re-renders with *each* update
+// export const selectOrdersByItem = (state: RootState, item: string) =>
+//   state.orders.filter((order) => order.items.includes(item))
+
+// the solution is to memoize selectors using 'createSelector()'
+export const selectOrdersByItem = createSelector(
+  selectOrders,
+  (_: RootState, itemName: string) => itemName,
+  (orders: OrderState[], itemName: string) =>
+    orders.filter((order) => includesIgnoreCase(order, itemName)),
+)
+
+// helper function, not related to Redux
+const includesIgnoreCase = (order: OrderState, itemName: string): boolean => {
+  return order.items.some((item) => item.toLowerCase() === itemName.toLowerCase())
+}
 
 export default ordersSlice.reducer

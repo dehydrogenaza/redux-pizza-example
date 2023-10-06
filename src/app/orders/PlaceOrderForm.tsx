@@ -31,7 +31,7 @@ const PlaceOrderForm = () => {
             type='text'
             id={'orderClientId'}
             name={'orderClientId'}
-            placeholder={'Choose client ID...'}
+            placeholder={'Enter client name...'}
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
           />
@@ -47,7 +47,7 @@ const PlaceOrderForm = () => {
             type='text'
             id={'orderItem'}
             name={'orderItem'}
-            placeholder={'Add item to order...'}
+            placeholder={'Enter ordered item...'}
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
           />
@@ -56,11 +56,7 @@ const PlaceOrderForm = () => {
           </button>
         </div>
       </form>
-      {canPlaceOrder() && (
-        <button onClick={handlePlaceOrder} disabled={!canPlaceOrder()}>
-          Place order
-        </button>
-      )}
+      {canPlaceOrder() && <button onClick={handlePlaceOrder}>Place order</button>}
     </>
   )
 }
