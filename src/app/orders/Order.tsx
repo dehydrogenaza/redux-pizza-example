@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { orderCanceled, selectOrderById } from './ordersSlice'
+import { beerRequested, orderCanceled, selectOrderById } from './ordersSlice'
 
 export interface OrderProps {
   orderId: string
@@ -12,6 +12,10 @@ const Order = ({ orderId }: OrderProps) => {
     dispatch(orderCanceled(orderId))
   }
 
+  const handleAddBeer = () => {
+    dispatch(beerRequested(orderId))
+  }
+
   const order = useAppSelector((state) => selectOrderById(state, orderId))
 
   return (
@@ -22,6 +26,7 @@ const Order = ({ orderId }: OrderProps) => {
       <p>{order?.date}</p>
       <ul>{order?.items.map((item, index) => <li key={`item-${index}`}>{item}</li>)}</ul>
       <button onClick={handleCancelOrder}>Cancel</button>
+      <button onClick={handleAddBeer}>Add beer</button>
     </li>
   )
 }

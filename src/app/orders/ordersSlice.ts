@@ -78,6 +78,12 @@ const ordersSlice = createSlice({
     orderCanceled: (state, action: PayloadAction<string>) => {
       state.data = state.data.filter((order) => order.id !== action.payload)
     },
+    beerRequested: (state, action: PayloadAction<string>) => {
+      const existingOrder = state.data.find((order) => order.id === action.payload)
+      if (existingOrder) {
+        existingOrder.items.push('beer')
+      }
+    },
   },
   extraReducers(builder) {
     builder
@@ -94,7 +100,7 @@ const ordersSlice = createSlice({
       })
   },
 })
-export const { orderPlaced, orderCanceled } = ordersSlice.actions
+export const { orderPlaced, orderCanceled, beerRequested } = ordersSlice.actions
 
 export const selectOrders = (state: RootState) => state.orders.data
 export const selectStatus = (state: RootState) => state.orders.status
